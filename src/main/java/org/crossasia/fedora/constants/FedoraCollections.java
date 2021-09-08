@@ -5,6 +5,8 @@ public enum FedoraCollections {
     MINGUO("ajax-minguo"),
     FO_CHINA_JAPAN("ajax-fo-china-japan"),
     DFZ("ajax-dfz"),
+    DLLM("dllm"),
+    DLNTM("dlntm"),
     LOCAL_GAZZETTER("ajax-loc-gaz");
 
     private String collection;

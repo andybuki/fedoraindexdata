@@ -33,6 +33,8 @@ public class Fedora {
         collections.put(FedoraCollections.RMRB.collection(), FedoraCollections.RMRB.name());
         collections.put(FedoraCollections.LOCAL_GAZZETTER.collection(), FedoraCollections.LOCAL_GAZZETTER.name());
         collections.put(FedoraCollections.DFZ.collection(), FedoraCollections.DFZ.name());
+        collections.put(FedoraCollections.DLLM.collection(), FedoraCollections.DLLM.name());
+        collections.put(FedoraCollections.DLNTM.collection(), FedoraCollections.DLNTM.name());
         collections.put(FedoraCollections.MINGUO.collection(), FedoraCollections.MINGUO.name());
 
         documents = new HashMap<>();

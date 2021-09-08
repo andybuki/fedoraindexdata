@@ -7,9 +7,14 @@
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.username">postgres</property>
+        <!--<property name="hibernate.connection.username">postgres</property>
         <property name="hibernate.connection.password">test</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/fcrepo</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/fcrepo</property>-->
+
+        <property name="hibernate.connection.username">crossasiafedora60dbuser</property>
+        <property name="hibernate.connection.password">YqBZppn1tL9JY8wO6U</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://zdd-crossasia-fedora-prod:5432/crossasia_fedora6_0_prod</property>
+
         <!--<property name="hibernate.current_session_context_class">thread</property>
         <property name="connection_pool_size">1</property>
         <property name="hbm2ddl.auto">create</property>

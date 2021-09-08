@@ -12,22 +12,19 @@
     <title>Delete Fedora</title>
 </head>
 <body>
-<h2>Delete Fedora Collection Part</h2>
+<h2>Delete Fedora Collection</h2>
 <h4>Fedora URL:</h4>
 ${fedora.url}
 
 <h4> Fedora Collection:</h4>
 ${fedora.collection}
 
-<h4>Document Type:</h4>
-${fedora.document}
-
 <h4>
-    Deleted Collection Part: ${fedora.collection}
+    Deleted Collection: ${fedora.collection}
     <br>
     Deleted Objects: ${deleted_objects}
 </h4>
 
-<a href="/fedora/delete">Back</a>
+<a href="/fedora/deleteCollection">Back</a>
 </body>
 </html>

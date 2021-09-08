@@ -1,6 +1,5 @@
 package org.crossasia.fedora.controller;
 
-import org.crossasia.fedora.FedoraFileCall;
 import org.crossasia.fedora.constants.FedoraCollections;
 import org.crossasia.fedora.constants.FedoraServers;
 import org.crossasia.fedora.entity.Containment;
@@ -23,24 +22,22 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.crossasia.fedora.constants.Constants.FEDORA_URL;
-
 @Controller
-public class DeleteController {
+public class DeleteCollectionController {
 
     FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().credentials("fedoraAdmin", "fedoraAdmin").build();
 
-    @RequestMapping("/delete")
+    @RequestMapping("/deleteCollection")
     public String askSettings (Model model) {
         Fedora fedora = new Fedora();
         fedora.setUrl(FedoraServers.TEST.server());
         fedora.setCollection(FedoraCollections.RMRB.collection());
         model.addAttribute("fedora", fedora);
 
-        return "delete/fedora-delete";
+        return "delete/fedora-collection-delete";
     }
 
-    @RequestMapping("/showDelete")
+    @RequestMapping("/showCollectionDelete")
     public String showSettings (@ModelAttribute("fedora") Fedora fedora, Model model) throws IOException {
 
         URI uri = URI.create(fedora.getUrl());
@@ -61,7 +58,7 @@ public class DeleteController {
                 /*if (containment.getParent().equals("info:fedora/"+fedora.getCollection())) {
                     urls.add(containment.getParent());
                 }*/
-                if (containment.getFedora_id().contains(fedora.getCollection()+"/")) {
+                if (containment.getFedora_id().contains(fedora.getCollection())) {
                    urls.add(containment.getFedora_id());
                 }
             }
@@ -86,6 +83,6 @@ public class DeleteController {
         }
         deleted_objects = urls.size();
         model.addAttribute("deleted_objects",deleted_objects);
-        return "delete/show-deleted-fedora";
+        return "delete/show-deleted-fedora-collection";
     }
 }

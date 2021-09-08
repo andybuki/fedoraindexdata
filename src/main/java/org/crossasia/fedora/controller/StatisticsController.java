@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 
@@ -31,29 +32,42 @@ public class StatisticsController {
 
     @RequestMapping("/statistics_show")
     public String statistics_show (@ModelAttribute("fedora") Fedora fedora, Model model) {
-        int count_books = 0;
-        int count_pages = 0;
-        int count_images = 0;
+        String collectionName = fedora.getCollection();
+        BigInteger count_books = BigInteger.valueOf(0);
+        BigInteger count_pages = BigInteger.valueOf(0);
+        BigInteger count_images = BigInteger.valueOf(0);
+
         FcrepoClient client = FcrepoClient.client().credentials("fedoraAdmin", "fedoraAdmin").build();
         URI uri = URI.create(fedora.getUrl());
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         try {
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
+            Session booksSession = sessionFactory.openSession();
+            Session imagesSession = sessionFactory.openSession();
+            Session pagesSession = sessionFactory.openSession();
+            booksSession.beginTransaction();
+            imagesSession.beginTransaction();
+            pagesSession.beginTransaction();
 
-            Query query_parent=session.createQuery("FROM Containment");
-            List<Containment> containmentList = (List<Containment>) ((org.hibernate.query.Query) query_parent).list();
+            count_images = (BigInteger) imagesSession.createNativeQuery("select count (*) FROM Containment where fedora_id" +
+                            " like '%/image%'"+
+                            "and fedora_id like :collectionName")
+                    .setParameter("collectionName", '%'+collectionName+'%')
+                    .getSingleResult();
 
-            session.close();
+            count_books = (BigInteger) booksSession.createNativeQuery("select count (*) FROM Containment where parent=:collectionName")
+                    .setParameter("collectionName", "info:fedora/"+collectionName)
+                    .getSingleResult();
 
-            for(Containment containment: containmentList) {
-                if (containment.getParent().equals("info:fedora/"+fedora.getCollection())) {
-                    count_books++;
-                }
-                if (containment.getParent().contains(fedora.getCollection()+"/")) {
-                    count_pages++;
-                }
-            }
+            count_pages = (BigInteger) pagesSession.createNativeQuery("select count (*) FROM Containment where not fedora_id" +
+                            " like '%/image%'"+
+                            "and fedora_id like :collectionName")
+                    .setParameter("collectionName", '%'+collectionName+'%')
+                    .getSingleResult();
+            //where not (fedora_id like '%/image%') and fedora_id like '%dllm%'
+
+            booksSession.close();
+            imagesSession.close();
+            pagesSession.close();
 
         } finally {
             sessionFactory.close();

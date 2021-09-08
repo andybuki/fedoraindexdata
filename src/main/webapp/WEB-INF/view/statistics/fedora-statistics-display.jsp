@@ -24,6 +24,7 @@ ${fedora.collection}
 
 <h4> In Collection: ${fedora.collection} are: ${count_pages} pages</h4>
 
+<h4> In Collection: ${fedora.collection} are: ${count_images} images</h4>
 <a href="/fedora/statistics">Back</a>
 
 </body>

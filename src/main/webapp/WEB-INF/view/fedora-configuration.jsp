@@ -15,6 +15,7 @@
 <h2>Fedora Start Page</h2>
 <br><br>
 <a href="/fedora/askSettings">Add new data to collection</a><br>
+<a href="/fedora/deleteCollection">Delete collection</a><br>
 <a href="/fedora/delete">Delete data from collection</a><br>
 <a href="/fedora/statistics">Display statistics</a>
 
