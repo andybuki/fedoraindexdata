@@ -8,13 +8,16 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.PostBuilder;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -48,7 +51,8 @@ public class ConfigurationController {
 
     @RequestMapping("/showSettings")
     public String showSettings (@ModelAttribute("fedora") Fedora fedora) throws IOException {
-
+        //BufferedWriter out = new BufferedWriter(new FileWriter("/mnt/b-isiprod-udl.pk.de/itr/archive/fedora/dlntm/files.sh"));
+        PrintStream out = new PrintStream(new FileOutputStream("/mnt/b-isiprod-udl.pk.de/itr/archive/fedora/dlntm/files.sh"));
         FcrepoClient client = FcrepoClient.client().credentials("fedoraAdmin", "fedoraAdmin").build();
         URI uri = URI.create(fedora.getUrl());
         //------------------------CREATE COLLECTION------------------------------------
@@ -81,15 +85,44 @@ public class ConfigurationController {
 
         File wholePath = new File(FOLDER_FILES +"/"+fedora.getCollection()+"/"+fedora.getPath());
         File[] files = wholePath.listFiles();
-
+        String cURLink ="";
+        String fedoraDocumentType = fedora.getDocument();
         for (final File file : files) {
-            //String book = file.getName().replaceAll("\\d{1,}page_","").replace(".json","");
+            JSONObject jsonObjPage = new JSONObject(new JSONTokener(new FileInputStream(file)));
+            JSONArray jsonArray = jsonObjPage.getJSONArray("@graph");
+            JSONObject graphObj = jsonArray.getJSONObject(0);
+
             String book = "";
+            String page_id = "";
+            String url = "";
+            String original_file_name = "";
+            if (fedoraDocumentType.equals("books")) {
+                book = "";
+                url = fedora.getCollection()+"/"+file.getName().replace(".json","");
+            } else if (fedoraDocumentType.equals("pages")) {
+
+                if (graphObj.has("schema:image")) {
+                    original_file_name = (String) graphObj.get("schema:image").toString();
+                }
+
+                book = file.getName().replace(".json","");
+                page_id = book.split("_")[1];
+                book = book.split("_")[0];
+
+                url = fedora.getCollection()+"/"+book+"/"+file.getName().replace(".json","");
+            } else if (fedoraDocumentType.equals("images")) {
+                book = "";
+                url = "";
+            }
+
+            cURLink = "curl -u fedoraAdmin:fedoraAdmin -i -X PUT --data-binary" + " @/mnt/b-isiprod-udl.pk.de/itr/archive/raw_collections/DLNTM/user_file/" + page_id + "/" +  original_file_name + " -H " + QUOTE + "Content-Type: image/jpg" + QUOTE + " -H \"Content-Disposition: attachment; filename=" + original_file_name + QUOTE+" " + "https://itr02.crossasia.org/fcrepo/rest/dlntm/"  + book + "/" + page_id+"/" + original_file_name.replace(".jpg","") + "/image";
+            out.println(cURLink);
 
             try (FcrepoResponse response = new PostBuilder(uri, clientBooks)
                     //82page_FO_371-83252_FOLDER_10_1950
-                    //.slug(book+"/"+file.getName().replace(".json",""))
-                    .slug(fedora.getCollection()+"/"+file.getName().replace(".json",""))
+                    .slug(url)
+                    //.slug(fedora.getCollection()+"/"+book+"/"+file.getName().replace(".json",""))
+                    //.slug(fedora.getCollection()+"/"+file.getName().replace(".json",""))
                     .body(file, "application/ld+json")
                     .filename(file.getName())
                     .perform();) {
@@ -105,6 +138,7 @@ public class ConfigurationController {
             }
             System.out.println(count);
         }
+
         return "index/show-fedora";
     }
 }
